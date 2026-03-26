@@ -2,27 +2,31 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 
+from locators import AUTH_LOC, ACCOUNT_PAGE, CONSTRUCTOR
+
+# Функция для заполнения данных при входе в аккаунт
 def fill_entry_form(driver, email, password):
-    driver.find_element(By.XPATH, ".//button[text()='Войти в аккаунт']").click()
 
-    WebDriverWait(driver, 3).until(expected_conditions.visibility_of_element_located((By.XPATH, ".//button[text()='Войти']")))
+    driver.find_element(*AUTH_LOC["login_account_button"]).click()
+    WebDriverWait(driver, 3).until(expected_conditions.visibility_of_element_located((AUTH_LOC["entrance_button"])))
 
-    driver.find_element(By.XPATH, ".//div[@id='root']/div/main/div/form/fieldset[1]/div/div/input").send_keys(email)
-    driver.find_element(By.XPATH, ".//div[@id='root']/div/main/div/form/fieldset[2]/div/div/input").send_keys(password)
+    driver.find_element(*AUTH_LOC['email_field']).send_keys(email)
+    driver.find_element(*AUTH_LOC['password_field']).send_keys(password)
 
-    driver.find_element(By.XPATH, ".//button[text()='Войти']").click()
+    driver.find_element(*AUTH_LOC["entrance_button"]).click()
+
+    WebDriverWait(driver, 3).until(expected_conditions.visibility_of_element_located((ACCOUNT_PAGE['place_an_order_button'])))
 
 # проверка перехода в раздел соусы
 def test_click_burger_sauces_section_open_sauces_section(driver):
 
     fill_entry_form(driver, "zoya_kozlova_42_123@ya.ru", "qwerty")
 
-    WebDriverWait(driver, 3).until(expected_conditions.visibility_of_element_located((By.XPATH, ".//button[text()='Оформить заказ']")))
 
-    driver.find_element(By.XPATH, './/div[@id="root"]/div/main/section[1]/div[1]/div[2]').click()
-    WebDriverWait(driver, 3).until(expected_conditions.visibility_of_element_located((By.XPATH, './/div[@id="root"]/div/main/section[1]/div[2]/ul[2]')))
+    driver.find_element(*CONSTRUCTOR["sauce_section"]).click()
+    WebDriverWait(driver, 3).until(expected_conditions.visibility_of_element_located((CONSTRUCTOR["sauces"])))
 
-    sauces = driver.find_element(By.XPATH, './/div[@id="root"]/div/main/section[1]/div[2]/h2[2]')
+    sauces = driver.find_element(*CONSTRUCTOR["sauces"])
 
     assert sauces.text == 'Соусы'
 
@@ -31,15 +35,13 @@ def test_click_burger_rolls_section_open_section(driver):
 
     fill_entry_form(driver, "zoya_kozlova_42_123@ya.ru", "qwerty")
 
-    WebDriverWait(driver, 3).until(expected_conditions.visibility_of_element_located((By.XPATH, ".//button[text()='Оформить заказ']")))
+    driver.find_element(*CONSTRUCTOR["sauce_section"]).click() #сначала переходим в раздел соусов, т.к по дефолту открыты булки
+    WebDriverWait(driver, 3).until(expected_conditions.visibility_of_element_located((CONSTRUCTOR["sauces"])))
 
-    driver.find_element(By.XPATH, './/div[@id="root"]/div/main/section[1]/div[1]/div[2]').click() #сначала переходим в раздел соусов, т.к по дефолту открыты булки
-    WebDriverWait(driver, 3).until(expected_conditions.visibility_of_element_located((By.XPATH, './/div[@id="root"]/div/main/section[1]/div[2]/h2[2]')))
+    driver.find_element(*CONSTRUCTOR["burger_rolls_section"]).click()
+    WebDriverWait(driver, 3).until(expected_conditions.visibility_of_element_located((CONSTRUCTOR["burger_rolls"])))
 
-    driver.find_element(By.XPATH, './/div[@id="root"]/div/main/section[1]/div[1]/div[1]').click()
-    WebDriverWait(driver, 3).until(expected_conditions.visibility_of_element_located((By.XPATH, './/div[@id="root"]/div/main/section[1]/div[2]/ul[1]')))
-
-    burger_rolls = driver.find_element(By.XPATH, './/div[@id="root"]/div/main/section[1]/div[2]/h2[1]')
+    burger_rolls = driver.find_element(*CONSTRUCTOR["burger_rolls"])
 
     assert burger_rolls.text == 'Булки'
 
@@ -48,12 +50,10 @@ def test_click_topping_section_open_topping_section(driver):
 
     fill_entry_form(driver, "zoya_kozlova_42_123@ya.ru", "qwerty")
 
-    WebDriverWait(driver, 3).until(expected_conditions.visibility_of_element_located((By.XPATH, ".//button[text()='Оформить заказ']")))
+    driver.find_element(*CONSTRUCTOR["toppings_section"]).click()
 
-    driver.find_element(By.XPATH, './/div[@id="root"]/div/main/section[1]/div[1]/div[3]').click()
+    WebDriverWait(driver, 3).until(expected_conditions.visibility_of_element_located((CONSTRUCTOR["toppings"])))
 
-    WebDriverWait(driver, 3).until(expected_conditions.visibility_of_element_located((By.XPATH, './/div[@id="root"]/div/main/section[1]/div[2]/h2[3]')))
-
-    toppings = driver.find_element(By.XPATH, './/div[@id="root"]/div/main/section[1]/div[2]/h2[3]')
+    toppings = driver.find_element(*CONSTRUCTOR["toppings"])
 
     assert toppings.text == 'Начинки'
